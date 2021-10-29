@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://unpkg.com/vuex@4.0.0/dist/vuex.global.js"></script>
+  
+  <title>Document</title>
+  <style>
+    ul {
+        list-style: none;
+        width: 500px;
+        background-color: grey;
+        margin: 0;
+        padding: 5px;
+        color: #fff;
+    }
+    li {
+        padding: 5px;
+        display: flex;
+    }
+    li div {
+        flex: 1 0 50px;
+    }
+
+  </style>
+</head>
+<!--
+ 
+-->
+<body>
+    <div id="demo">
+        
+      <!-- <my-list :data="listData">
+        <template v-slot="slotScope">
+          <my-item label="名称">{{ slotScope.item.name }}</my-item>
+          <my-item label="年龄">{{ slotScope.item.age }}</my-item>
+        </template>
+      </my-list> -->
+
+      <!-- 解构插槽 Prop -->
+      <my-list :data="listData">
+        <template v-slot="{ item }">
+          <my-item label="名称">{{ item.name }}</my-item>
+          <my-item label="年龄">{{ item.age }}</my-item>
+          <my-item label="操作">
+            <button @click.stop="onRemove(item)">删除</button>
+          </my-item>
+        </template>
+      </my-list>
+
+    </div>
+    <script type="module">
+        import { store } from './js/store.js'
+        import { MyList, MyItem } from './js/main.js'
+
+        const app = Vue.createApp({
+          data(){
+            return {
+              listData: [
+                {id: 1, name: "张三", age: "18"},
+                {id: 2, name: "李四", age: "19"},
+                {id: 3, name: "王五", age: "20"},
+              ]
+            }
+          },
+          methods: {
+            onRemove(item) {
+              const curIndex = this.listData.findIndex( v => v.id == item.id)
+              this.listData.splice(curIndex , 1)
+            }
+          },
+        });
+        app.use(store)
+        app.component('my-list', MyList)
+        app.component('my-item', MyItem)
+        const vm = app.mount('#demo');
+    </script>
+</body>
+</html>

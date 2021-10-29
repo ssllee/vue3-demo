@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	
+</head>
+<!--
+
+	### Proxy 对象响应式原理
+	const dinner = {
+		meal: 'tacos'
+	}
+	const handler = {
+		get(target, property, receiver) {
+			track(target, property)
+			return Reflect.get(...arguments)
+		},
+		set(target, property, value, receiver) {
+			trigger(target, property)
+			return Reflect.set(...arguments)
+		}
+	}
+	const proxy = new Proxy(dinner, handler)
+	console.log(proxy.meal) // get track 跟踪一个 property 何时被读取，使 property 与副作用依赖
+
+	proxy.meal = 'hello' // set trigger 重新触发该 property 的副作用
+
+	### Vue 如何实现这些关键步骤：
+	1.当一个值被读取时进行追踪：proxy 的 get 处理函数中 track 函数记录了该 property 和当前副作用。
+	2.当某个值改变时进行检测：在 proxy 上调用 set 处理函数。
+	3.重新运行代码来读取原始值：trigger 函数查找哪些副作用依赖于该 property 并执行它们。
+
+-->
+<style>
+	.item {
+		cursor: pointer;
+	}
+</style>
+<body>
+	<div id="example">
+		{{ msg }}
+		
+		<todo-item class="item"
+			v-for="item in groceryList"
+			v-bind:todo="item"
+			v-bind:key="item.id"
+			v-bind:title="todoTitle"
+			@do-show="msg += $event"
+		></todo-item>
+	</div>
+
+	<script>
+
+		
+		const appData = {
+			data() {
+				return {
+					msg: '响应式API',
+					groceryList: [
+						{ id: 0, text: '张三'},
+						{ id: 1, text: '李四'},
+					],
+					todoTitle: '组件todo-item'	
+				}
+			},
+			created() {
+				console.log('created()')
+			},
+			beforeMount() {
+				console.log('beforeMount()')
+			},
+			mounted() {
+				console.log('mounted()')
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		
+		app.component('todo-item', {
+			props: {
+				todo: {
+					type: Object,
+					default() {
+						return {
+							text:''
+						}
+					}
+				},
+				title: String
+			},
+			// props: ['todo', 'title'],
+			setup(props, context) {// setup(props, { attrs, slots, emit, expose }) {
+				
+				/* props 是响应式的不能解构	*/
+				
+				// const title = Vue.toRef(props)
+				// const atitle = Vue.toRef(props, 'title')
+				// console.log(`toRef:${atitle.value}`)
+				// const { todo, title } = Vue.toRefs(props)
+				// console.log(`toRefs:${todo.value.text}`)
+
+				/****** context	非响应式的可以解构 ******/
+
+				// Attribute (非响应式对象，等同于 $attrs)
+				// console.log(context.attrs) // 如： class
+				
+				// 插槽 (非响应式对象，等同于 $slots)
+				// console.log(context.slots)
+
+				// 触发事件 (方法，等同于 $emit)
+				// console.log(context.emit)
+
+				// 暴露公共 property (函数)
+				// console.log(context.expose)
+
+				/****** ref 接受一个内部值并返回一个响应式且可变的 ref 对象。ref 对象具有指向内部值的单个 property .value。	*******/
+				/****** reactive (深度转换)返回对象的响应式副本,将解包所有深层的 refs，同时维持 ref 的响应性。	*******/
+				/*
+				const count = Vue.ref(1)
+				const obj = Vue.reactive({ count })
+				console.log(Vue.isReactive(obj)) // true
+				console.log(Vue.isProxy(obj)) // true
+
+				// ref 会被解包
+				console.log(obj.count === count.value) // true
+
+				// 它会更新 `obj.count`
+				count.value++
+				console.log(count.value) // 2
+				console.log(obj.count) // 2
+
+				// 它也会更新 `count` ref
+				obj.count++
+				console.log(obj.count) // 3
+				console.log(count.value) // 3
+				*/
+
+				/******  readonly (深度转换)接受一个对象 (响应式或纯对象) 或 ref 并返回原始对象的只读代理, ******/
+				/*
+				const original = Vue.reactive({ count: 0})
+				const copy = Vue.readonly(original)
+				console.log(Vue.isReadonly(copy)) // true
+				console.log(Vue.isReactive(copy)) // true
+				console.log(Vue.isProxy(copy)) // true	只读代理
+				
+				Vue.watchEffect(() => {
+				  // 用于响应性追踪
+				  console.log(copy.count)
+				})
+
+				// 变更 original 会触发依赖于副本的侦听器
+				original.count++
+
+				// 变更副本将失败并警告
+				copy.count++ // 警告! (Set operation on key "count" failed: target is readonly)
+				*/
+
+				/****** markRaw 标记一个对象，使其永远不会转换为 proxy。返回对象本身。 ******/
+				const rawObj = Vue.markRaw({})
+				console.log(Vue.isReactive(rawObj)) // false
+
+				/****** shallowReactive (浅解包) 创建一个响应式代理，它跟踪其自身 property 的响应性，但不执行嵌套对象的深层响应式转换 (暴露原始值) ******/
+				
+				
+				/****** shallowReadonly (浅只读) 创建一个 proxy，使其自身的 property 为只读，但不执行嵌套对象的深度只读转换 (暴露原始值)。******/
+
+				const myNum = Vue.ref(10)
+				// const myNum = Vue.unref(20)
+				const myObj = Vue.reactive({
+					count: 0
+				})
+				console.log(myObj.count === 0) // true
+
+				// 暴露给 template
+				return {
+					myNum,
+					myObj
+				}	
+			},
+			template: `
+				<li @click="$emit('doShow', title)">
+					<div>{{ todo.text }} - {{ myObj.count }}</div>
+					<div><input v-model='myNum'/>{{ myNum }}</div>
+				</li>
+			`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

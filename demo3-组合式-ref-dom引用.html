@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	
+</head>
+<!--
+
+	
+-->
+<style>
+	.item {
+		cursor: pointer;
+	}
+</style>
+<body>
+	<div id="example">
+		<div ref="root">This is a root element</div>
+	</div>
+
+	<script>
+		
+		const appData = {
+			setup() {
+				const root = Vue.ref(null)
+
+				Vue.onMounted(() => {
+					console.log(root.value)
+				})
+
+				return {
+					root
+				}
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

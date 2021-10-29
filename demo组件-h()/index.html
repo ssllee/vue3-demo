@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+      <div>
+        <!-- h() -->
+        <div class="demo">
+          <render-button></render-button>
+        </div>
+    
+        <!-- h() slot default -->
+        <div class="demo">
+          <render-link href="http://www.baidu.com"> 我的超链接 </render-link>
+        </div>
+    
+        <!-- h() slot default 有参 -->
+        <div class="demo">
+          <render-div :item="divItem">
+            <!-- <template v-slot="{ item }"> 这个#default代替-->
+            <template #default="{ item }">
+              <span>{{ item.firstName }}</span>
+              <span>{{ item.lastName }}</span>
+            </template>
+          </render-div>
+        </div>
+      </div>
+    </div>
+    <script type="module">
+        import { RenderButton, RenderDiv, RenderLink } from './js/main.js'
+        const app = Vue.createApp({
+          setup() {
+            const divItem = {
+                firstName: 'Wang',
+                lastName: 'laowu'
+            }
+
+            return {
+                divItem
+            }
+          }
+        });
+        app.component('render-button', RenderButton)
+        app.component('render-div', RenderDiv)
+        app.component('render-link', RenderLink)
+        const vm = app.mount('#app');
+    </script>
+</body>
+</html>

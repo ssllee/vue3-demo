@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+        <my-date-picker data-status="activated" @change="onChangeDate"></my-date-picker>
+        
+        <!--change 事件监听器从父组件传递到子组件，它将在原生 select 的 change 事件上触发。我们不需要显式地从 my-select 发出事件-->
+        <my-select @change="onChangeSelect"></my-select>
+        
+        <my-input @input="onInput" class="myclass" style="color:blueviolet;font-size: 20px;"></my-input>
+        
+    </div>
+    <script type="module">
+        import { MyDatePicker, MySelect, MyInput } from './js/main.js'
+        const app = Vue.createApp({
+          data() {
+              return {
+              }
+          },
+          methods: {
+              onChangeDate(e) {
+                  console.log(e.target.value)
+              },
+              onChangeSelect(e) {
+                  console.log(e.target.value)
+              },
+              onInput(e) {
+                  console.log(e.target.value)
+              },
+          }
+        });
+        app.component('my-date-picker', MyDatePicker)
+        app.component('my-select', MySelect)
+        app.component('my-input', MyInput)
+        const vm = app.mount('#app');
+    </script>
+</body>
+</html>

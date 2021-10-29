@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+      <div>子组件点击时：{{count}}</div>
+      <my-button @my-add-event='addEvent'></my-button>
+    </div>
+    <script type="module">
+        // import * as obj from './js/main.js'
+        import { MyBtn } from './js/main.js'
+        const app = Vue.createApp({
+          data() {
+              return {
+                  count: 0
+              }
+          },
+          methods: {
+              addEvent(data) {
+                  this.count += data;
+              }
+          }
+        });
+        app.component('my-button', MyBtn)
+        const vm = app.mount('#app');
+    </script>
+</body>
+</html>

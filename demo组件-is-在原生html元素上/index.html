@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+
+      <!-- is attribute 被用在一个原生 HTML 元素上时，它会被作为一个自定义的内置元素 -->
+      <table border="1">
+        <tr is="vue:my-vue-custom" msg="tr is 绑定 defineCustomElement vue 组件"></tr>
+      </table>
+      
+      <hr>
+
+      <table border="1">
+        <tr is="vue:my-component" msg="tr is 绑定 vue 组件"></tr>
+      </table>
+
+      <hr>
+
+      <!-- table 内部有特定的元素tr，如果直接使用 'my-component' 组件，则会被单独提出去显示 -->
+      <table border="1">
+        <my-vue-custom msg="单独 defineCustomElement vue 组件"></my-vue-custom>
+        <my-component msg="单独 vue 组件"></my-component>
+      </table>
+
+    </div>
+    <script type="module">
+        import './js/custom.js'
+        import { MyComponent } from './js/main.js'
+
+        const app = Vue.createApp({
+          setup() {
+              
+            return {
+              
+            }
+          }
+        });
+        app.component('my-component', MyComponent)
+        const vm = app.mount('#app');
+    </script>
+</body>
+</html>

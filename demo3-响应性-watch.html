@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	
+</head>
+<!--
+
+	
+-->
+<style>
+	.item {
+		cursor: pointer;
+	}
+</style>
+<body>
+	<div id="example">
+		{{ msg }}
+		
+		<todo-item></todo-item>
+	</div>
+
+	<script>
+
+		
+		const appData = {
+			data() {
+				return {
+					msg: '响应式API'	
+				}
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		
+		app.component('todo-item', {
+			setup(props, context) {
+				
+				const firstName = Vue.ref('')
+  				const lastName = Vue.ref('')
+
+				Vue.watch([firstName, lastName], (newValue, prevValue) => {
+					console.log(newValue)
+				})
+
+				const changeValues = () => {
+					firstName.value = 'John'
+					lastName.value = 'Smith'
+					// 打印 ['John', 'Smith']
+				}
+
+				// 为每个更改都强制触发侦听器，尽管这通常是不推荐的。可以用 nextTick 等待侦听器在下一步改变之前运行
+				const changeValues2 = async () => {
+					firstName.value = 'John2' // 打印 ['John2', '']
+					await Vue.nextTick()
+					lastName.value = 'Smith2' // 打印 ['John2', 'Smith2']
+				}
+
+				// 暴露给 template
+				return {
+					firstName,
+					lastName,
+					changeValues,
+					changeValues2
+				}	
+			},
+			template: `
+				<div>
+					<div>firstName:<input v-model="firstName"/>{{ firstName }}</div>
+					<div>lastName:<input v-model="lastName"/>{{ lastName }}</div>
+					<button @click="changeValues">changeValues</button>
+					<button @click="changeValues2">changeValues2</button>
+				</div>
+			`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

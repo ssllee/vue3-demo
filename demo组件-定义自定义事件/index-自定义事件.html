@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+      <div id="mybtn">点我触发</div>
+    </div>
+    <script type="module">
+
+      const obj = document.querySelector('#mybtn')
+      
+      /*
+      // 添加一个适当的事件监听器
+      obj.addEventListener('myclick', function(e) { alert(e.detail.test) })
+
+      // 创建并分发事件
+      var event = new CustomEvent('myclick', { "detail":{'test' : 'ok' }})
+      obj.dispatchEvent(event)
+      */
+
+      obj.addEventListener('myclick', function(e) { alert(e.detail.test) })
+
+      obj.addEventListener('click', function(e) {
+        const event = new CustomEvent('myclick', { "detail":{'test' : 'ok' }})
+        e.target.dispatchEvent(event)
+      })
+      
+    </script>
+</body>
+</html>

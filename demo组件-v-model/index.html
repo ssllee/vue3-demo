@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<!--
+    1.组件上的 v-model 使用 modelValue 作为 prop 和 update:modelValue 作为事件
+
+    <my-component v-model="searchText"></my-component>
+
+    这个相当于下面的简写：
+
+    <my-component :modelValue="searchText" @update:modelValue="searchText = $event"></my-component>
+
+    2.v-model 可绑定多个
+
+-->
+<body>
+    <div id="demo">
+      <div>子组件输入时：{{searchText}}</div>
+      <my-component v-model="searchText" v-model:search-text="searchText"></my-component>
+    </div>
+    <script type="module">
+      import { MyComponent } from './js/main.js'
+      const app = Vue.createApp({
+        data(){
+          return{
+            searchText:""
+          }
+        }
+      });
+      app.component('my-component', MyComponent)
+      const vm = app.mount('#demo');
+    </script>
+</body>
+</html>

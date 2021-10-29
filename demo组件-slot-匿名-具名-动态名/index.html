@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.core.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.fp.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+	
+    <title>Document</title>
+</head>
+<!--
+ 
+-->
+<body>
+    <div id="demo">
+        
+      <!-- 匿名插槽 -->
+      <!-- <submit-button @do-submit="doSubmit"></submit-button> -->
+      <submit-button @do-submit="doSubmit"> 防抖保存 </submit-button>
+
+      <hr>
+
+      <!-- 具名插槽 -->
+      <my-panel>
+          <template v-slot:header>
+            <p>开始</p>
+          </template>
+        
+          <template v-slot:default>
+            <p>这是主要内容</p>
+          </template>
+        
+          <template v-slot:footer>
+            <p>结束</p>
+          </template>
+      </my-panel>
+
+      <hr>
+
+      <!-- 具名插槽缩写 #name -->
+      <my-panel>
+          <template #header>
+            <p>开始</p>
+          </template>
+        
+          <template #default>
+            <p>这是主要内容</p>
+          </template>
+        
+          <template #footer>
+            <p>结束</p>
+          </template>
+      </my-panel>
+
+      <hr/>
+
+      <!-- 动态插槽名, 命名需小写 -->
+      <my-panel>
+          <template v-slot:[dynamicslotname]>
+            <p>动态插槽 {{ dynamicslotname }}</p>
+          </template>
+      </my-panel>
+
+    </div>
+
+    <script type="module">
+        import { SubmitButton, MyPanel } from './js/main.js'
+        const app = Vue.createApp({
+          setup() {
+              const dynamicslotname = Vue.unref('header')
+
+              const doSubmit = () => {
+                  console.log('执行submit')
+              }
+              return {
+                  dynamicslotname,
+                  doSubmit
+              }
+            }
+        });
+        app.component('submit-button', SubmitButton)
+        app.component('my-panel', MyPanel)
+        const vm = app.mount('#demo');
+    </script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	<!-- <script src="../vue-3.1.5.js"></script> -->
+</head>
+
+<body>
+	<div id="example">
+		<ol>
+			<!--
+			 现在我们为每个 todo-item 提供 todo 对象
+			 todo 对象是变量，即其内容可以是动态的。
+			 我们也需要为每个组件提供一个“key”
+		   -->
+		   <todo-item
+			 v-for="item in groceryList"
+			 v-bind:todo="item"
+			 v-bind:key="item.id"
+		   ></todo-item>
+	</div>
+
+	<script>
+		const appData = {
+			data() {
+				return {
+					groceryList: [
+						{ id: 0, text: 'Vegetables' },
+						{ id: 1, text: 'Cheese' },
+						{ id: 2, text: 'Whatever else humans are supposed to eat' }
+					]
+				}
+			},
+			created() {
+				console.log('created()');
+			},
+			beforeMount() {
+				console.log('beforeMount()');
+			},
+			mounted() {
+				console.log('mounted()');
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		// 定义名为 todo-item 的新组件
+		app.component('todo-item', {
+			props: ['todo'],
+			template: `<li>{{ todo.text }}</li>`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

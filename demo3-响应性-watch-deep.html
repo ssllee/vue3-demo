@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.core.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.fp.min.js"></script>
+	<script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+	
+</head>
+<!--
+
+	
+-->
+<style>
+	.item {
+		cursor: pointer;
+	}
+</style>
+<body>
+	<div id="example">
+		{{ msg }}
+		
+		<todo-item></todo-item>
+	</div>
+
+	<script>
+
+		
+		const appData = {
+			data() {
+				return {
+					msg: '响应式API'
+				}
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		
+		app.component('todo-item', {
+			setup(props, context) {
+				
+				const myArray = Vue.reactive([1, 2, 3, 4])
+				const myObject = Vue.reactive({ 
+					id: 1,
+					attributes: { 
+						name: '',
+					}
+				})
+
+				Vue.watch(
+					() => [...myArray], // 由值构成一个副本
+					(newValue, prevValue) => {
+						console.log(newValue, prevValue)
+					}
+				)
+				Vue.watch(
+					() => _.cloneDeep(myObject), //() => myObject,  这样newValue, prevValue 值相同，需要深度clone,前后值可不同
+					(newValue, prevValue) => {
+						console.log('deep', newValue.attributes.name, prevValue.attributes.name)
+					},
+					{ deep: true }
+				)
+
+				const changeArray = () => {
+					myArray.push(5) // 打印: [1,2,3,4,5] [1,2,3,4]
+				}
+
+				const changeObject = () => {
+					myObject.attributes.name = '王五' + Math.random(100)
+				}
+
+				
+				// 暴露给 template
+				return {
+					changeArray,
+					changeObject
+				}	
+			},
+			template: `
+				<div>
+					<button @click="changeArray">changeArray</button>
+					<button @click="changeObject">changeObject</button>
+				</div>
+			`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

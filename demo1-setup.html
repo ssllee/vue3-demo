@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<!--
+
+-->
+<body>
+	<div id="demo">
+		<div :style="{ fontSize: postFontSize + 'em' }">
+			<blog-post 
+				class="myclass"
+				v-for="post in posts" 
+				:key="post.id" 
+				:title="post.title" 
+				@enlarge-text="onEnlargeText"
+			></blog-post>
+		</div>
+	</div>
+    <script type="module">
+		// 在组合式函数中调用也可以正常执行
+		function useComponentId() {
+		  return Vue.getCurrentInstance().uid
+		}
+
+		const AppObj = {
+            setup() {
+				// 获取组件实例 (setup和生命周期中使用)
+				const { proxy, ctx, uid } = Vue.getCurrentInstance()
+				console.log('getCurrentInstance()中的uid:', uid)
+				console.log('getCurrentInstance()中的ctx:', ctx)
+				console.log('getCurrentInstance()中的proxy:', proxy)
+				
+				// const id = useComponentId() // 有效
+
+				//---blog-post
+				const posts = [
+					{ id: 1, title: '风吹林啸，天鹊巍峨山中立。' },
+					{ id: 2, title: '峻岭环绕，万缕白烟细。' },
+					{ id: 3, title: '朱雀腾空，遥飞奔天际，平生事。' },
+					{ id: 4, title: '星空凝睇，梦绕无悔意。' }
+				]
+				const postFontSize = Vue.ref(1) // 响应式
+
+				const onEnlargeText = function (enlargeAmount) {
+					// Vue.getCurrentInstance() // 无效
+					// useComponentId() // 无效
+					console.log(ctx, id) //
+
+					postFontSize.value += enlargeAmount // 注意：ref() 响应式变量，取值 postFontSize.value
+				}
+
+
+				// ---生命周期
+				Vue.onBeforeMount(() => {
+					console.log('beforeMount!')
+				})
+				Vue.onMounted(() => {
+					Vue.getCurrentInstance() // 有效
+
+					console.log('mounted!')
+				})
+				Vue.onUpdated(() => {
+					console.log('updated!')
+				})
+				Vue.onUnmounted(() => {
+					console.log('unmounted!')
+				})
+				Vue.onBeforeUnmount(() => {
+					console.log('beforeUnmount!')
+				})
+				Vue.onRenderTracked(({ key, target, type }) => {
+					console.log('tracked!', { key, target, type })
+				})
+				Vue.onRenderTriggered(({ key, target, type }) => {
+					console.log('triggered!', { key, target, type })
+				})
+
+				return {
+					posts,
+					postFontSize,
+					onEnlargeText
+				}
+			}
+        }
+		const BlogPost = {
+			props: {
+				title: String
+			},
+			emits: ['enlargeText'],
+			setup(props, context) {// props 是响应式的不能解构，conext非响应式的可以解构
+			//setup(props, { attrs, slots, emit, expose }) {
+				console.log(props.title)
+				// const title = toRef(props)
+				// const title = toRef(props, 'title')
+
+				// Attribute (非响应式对象，等同于 $attrs)
+				// console.log('$attrs:', context.attrs)
+
+				// 插槽 (非响应式对象，等同于 $slots)
+				// console.log('$slots:', context.slots)
+
+				// 触发事件 (方法，等同于 $emit)
+				// console.log('$emit:', context.emit)
+
+				// 暴露公共 property (函数) v3.2
+				// console.log('expose:', context.expose)
+			},
+			template: `
+			<div class="blog-post">
+				<h4>{{ title }}</h4>
+				<button @click="$emit('enlargeText', 0.1)"> Enlarge text </button>
+			</div>
+			`
+		}
+
+        const app = Vue.createApp(AppObj);
+        app.component('blog-post', BlogPost)
+        const vm = app.mount('#demo');
+    </script>
+</body>
+</html>

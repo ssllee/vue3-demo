@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	
+</head>
+<!--
+
+	
+-->
+<style>
+	.item {
+		cursor: pointer;
+		margin: 10px;
+		padding: 20px;
+		border: 1px solid green;
+	}
+</style>
+<body>
+	<div id="example">
+		{{ msg }}
+		
+		<todo-item class="item"
+			v-for="item in groceryList"
+			v-bind:todo="item"
+			v-bind:key="item.id"
+			v-bind:title="todoTitle"
+			@do-show="msg += $event"
+		></todo-item>
+	</div>
+
+	<script>
+
+		
+		const appData = {
+			data() {
+				return {
+					msg: '响应式API',
+					groceryList: [
+						{ id: 0, text: '张三'},
+						{ id: 1, text: '李四'},
+					],
+					todoTitle: '组件todo-item'	
+				}
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		
+		app.component('todo-item', {
+			props: ['todo', 'title'],
+			setup(props, context) {
+
+				// 基本类型 响应式
+				const count = 0
+				const myCount = Vue.ref(count)
+				console.log(`ref myCount: ${myCount.value}`)
+				
+				// 数组 响应式
+				let myArray = Vue.ref([])
+				let myArray2 = Vue.reactive([])
+
+				// const ooo = {
+				// 	a: 1,
+				// 	b: 2
+				// }
+				// const myOOO = Vue.ref(ooo)
+				// console.log(`ref myOOO: ${myOOO.value.a}`)
+				
+
+				// const myTitle = Vue.toRef(props, 'title')
+				// console.log(`toRef myTitle: ${myTitle.value}`)
+				// myTitle.value = '改变title' // Set operation on key "title" failed: target is readonly
+				// console.log(myTitle)
+
+				// 对象 响应式
+				const obj = Vue.reactive({ 
+					foo: 10,
+					boo: { name: 'boo', age: '22'}
+				})
+				const myFoo = Vue.toRef(obj, 'foo')
+				const myBoo = Vue.toRef(obj, 'boo')
+				console.log(`toRef myFoo: ${myFoo.value}`)
+				console.log(`toRef myBoo: ${myBoo.value.name}-${myBoo.value.age}`)
+				
+				// const myObjRefs = Vue.toRefs(obj)
+				// console.log(`toRefs myObjRefs: ${myObjRefs.foo.value}-${myObjRefs.boo.value.name}-${myObjRefs.boo.value.age}`)
+				
+				const { foo, boo } = Vue.toRefs(obj) // toRefs() 可解构得到响应式对象
+				console.log(`toRefs foo: ${foo.value}`)
+				console.log(`toRefs boo: ${boo.value.name}-${boo.value.age}`)
+				
+
+				const changFun = () => {
+					myCount.value += 1
+					myFoo.value += 1
+					myBoo.value.name = 'hello'
+					myBoo.value.age = 33
+
+					show()
+					
+					foo.value += 1
+					boo.value.name = 'boo name change'
+					boo.value.age = 44
+					
+					show()
+				}
+				
+				const show = () => {
+					console.log(count)
+					console.log(myCount.value)
+
+					console.log(obj.foo)
+					console.log(myFoo.value)
+					console.log(foo.value)
+
+					console.log(obj.boo.name)
+					console.log(myBoo.value.name)
+					console.log(boo.value.name)
+
+					console.log(obj.boo.age)
+					console.log(myBoo.value.age)
+					console.log(boo.value.age)
+
+					console.log('---------------')
+				}
+
+				Vue.onMounted(() => {
+					myArray.value = ['张三', '李四', '王五'] 
+					myArray2.push(['张三2', '李四2', '王五2'])
+				})
+
+				// 暴露给 template
+				return {
+					myCount,
+					myFoo,
+					myBoo,
+					changFun,
+					show,
+					...Vue.toRefs(obj) // toRefs 非常有用，可以在不丢失响应性的情况下对obj对象进行解构
+				}	
+			},
+			template: `
+				<div @click="$emit('doShow', title)">
+					<div>{{ todo.text }} - {{ foo }} - {{ boo.name }}</div>
+					<div>myCount:<input v-model='myCount'/>{{ myCount }}</div>
+					<div>myFoo:<input v-model='myFoo'/>{{ myFoo }}</div>
+					<div>myBoo.name:<input v-model='myBoo.name'/>{{ myBoo.name }}</div>
+					<button @click="changFun">changFun</button>
+					<button @click="show">show</button>
+				</div>
+			`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>

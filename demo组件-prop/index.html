@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@next"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <div></div>
+        <my-component 
+          :propa='propa' 
+          :propb='propb' 
+          :propc='propc' 
+          :propd='propd' 
+          :prope='prope' 
+          :propf='propf' 
+        ></my-component>
+    </div>
+    <script type="module">
+        import { MyComponent } from './js/main.js'
+        const app = Vue.createApp({
+          data() {
+            return {
+              propa: 10,
+              // propb: 20,
+              propb: 'b接送多种类型',
+              propc: 'c必填',
+              propd: '默认字符串改变',
+              prope: {
+                  id: 1,
+                  title: '对象的属性'
+              },
+              propf:'success',
+              propg:function(){ return '默认function() 改变'}
+            }
+          },
+          methods: {
+          }
+        });
+        app.component('my-component', MyComponent)
+        const vm = app.mount('#app');
+    </script>
+</body>
+</html>

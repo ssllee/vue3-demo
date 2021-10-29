@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<script src="https://unpkg.com/vue@next"></script>
+	
+</head>
+<!--
+
+	
+-->
+<style>
+	.item {
+		cursor: pointer;
+	}
+</style>
+<body>
+	<div id="example">
+		{{ msg }}
+		
+		<todo-item></todo-item>
+	</div>
+
+	<script>
+
+		
+		const appData = {
+			data() {
+				return {
+					msg: '响应式API'
+				}
+			}
+		}
+		const app = Vue.createApp(appData)
+		
+		
+		app.component('todo-item', {
+			setup(props, context) {
+
+				// count plusOne 互相影响
+				const count = Vue.ref(1)
+				const plusOne = Vue.computed({
+					get: () => count.value + 1,
+					set: val => {
+						count.value = val - 1
+					}
+				})
+
+				// plusOne.value = 2
+				// console.log(plusOne.value) // 2
+				// console.log(count.value) // 1
+
+				const stop = Vue.watchEffect(() => {
+					console.log(`watchEffect count: ${ count.value }`)
+					console.log(`watchEffect plusOne: ${ plusOne.value }`)
+				})
+
+				// 停止监听
+				// stop()
+
+				// 暴露给 template
+				return {
+					count,
+					plusOne
+				}	
+			},
+			template: `
+				<div>
+					<div>count:<input v-model="count" type="number"/>{{ count }}</div>
+					<div>plusOne:<input v-model="plusOne" type="number"/>{{ plusOne }}</div>
+				</div>
+			`
+		})
+
+		app.mount('#example');
+		
+	</script>
+
+</body>
+
+</html>
